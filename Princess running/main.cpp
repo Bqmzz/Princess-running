@@ -20,7 +20,11 @@ int main()
     sf::Texture playerTexture;
     playerTexture.loadFromFile("princessrun.png");
 
-    Player player(&playerTexture, sf::Vector2u(5, 1), 0.3f, 100.0f, 100.0f);
+    // debug
+    sf::Texture playerSlideTexture;
+    playerSlideTexture.loadFromFile("princessslide.png");
+
+    Player player(&playerTexture, &playerSlideTexture,sf::Vector2u(5, 1), 0.3f, 100.0f, 100.0f);
 
     std::vector<Platform> platforms;
 

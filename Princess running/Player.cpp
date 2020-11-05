@@ -1,7 +1,8 @@
 #include "Player.h"
 
-Player::Player(sf::Texture* texture, sf::Vector2u imageCount, float switchTime, float speed, float jumpHeight) :
-	animation(texture, imageCount, switchTime)
+Player::Player(sf::Texture* texture, sf::Texture* slideTexture, sf::Vector2u imageCount, float switchTime, float speed, float jumpHeight) :
+	normalAnimation(texture, imageCount, switchTime),
+	slideAnimation(slideTexture, sf::Vector2u(4, 1), switchTime)
 {
 	this->speed = speed;
 	this->jumpHeight = jumpHeight;
@@ -12,6 +13,9 @@ Player::Player(sf::Texture* texture, sf::Vector2u imageCount, float switchTime, 
 	body.setOrigin(body.getSize() / 2.0f);
 	body.setPosition(206.0f, 206.0f);
 	body.setTexture(texture);
+
+	this->slideTexture = slideTexture;
+	this->normalTexture = texture;
 }
 
 void Player::Update(float deltaTime)
@@ -38,6 +42,12 @@ void Player::Update(float deltaTime)
 		velocity.y = -sqrtf(2.0f * 2000.0f * jumpHeight);
 	}
 
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+		this->statePlayer = 1;
+	}
+	else {
+		this->statePlayer = 0;
+	}
 	velocity.y += 981.0f * deltaTime;
 
 	if (velocity.x == 0.0f)
@@ -54,8 +64,26 @@ void Player::Update(float deltaTime)
 			faceRight = false;
 	}
 
-	animation.Update(row, deltaTime, faceRight);
-	body.setTextureRect(animation.uvRect);
+	switch (this->statePlayer)
+	{
+	case 0:
+		body.setTexture(this->normalTexture);
+		normalAnimation.Update(row, deltaTime, faceRight);
+		body.setTextureRect(normalAnimation.uvRect);
+		this->body.setScale(sf::Vector2f(1, 1));
+		break;
+	case 1:
+		body.setTexture(this->slideTexture);
+		slideAnimation.Update(row, deltaTime, faceRight);
+		body.setTextureRect(slideAnimation.uvRect);
+		this->body.setScale(sf::Vector2f(0.7, 0.8));
+		//this->body.setPosition(this->body.getPosition().x, 400.0f);
+		//std::cout << "do state1" << std::endl;
+		break;
+	default:
+		break;
+	}
+	
 	body.move(velocity * deltaTime);
 }
 
